@@ -11,6 +11,7 @@ from custom_components.mcp_server_http_transport.tools.categories import (
     delete_category,
     list_categories,
     resolve_category_id,
+    update_category,
     write_entity_category,
 )
 
@@ -108,6 +109,20 @@ class TestDeleteCategory:
 
         reg.async_delete.assert_called_once_with(scope="script", category_id="c1")
         assert "Deleted category c1" in result["content"][0]["text"]
+
+
+class TestUpdateCategory:
+    """Tests for the update_category tool."""
+
+    async def test_update_category_no_fields_returns_message(self):
+        """update_category does nothing when neither name nor icon is supplied."""
+        reg = Mock()
+
+        with patch(CR_GET, return_value=reg):
+            result = await update_category(Mock(), {"scope": "automation", "category_id": "abc"})
+
+        assert "Nothing to update" in result["content"][0]["text"]
+        reg.async_update.assert_not_called()
 
 
 class TestResolveCategoryId:

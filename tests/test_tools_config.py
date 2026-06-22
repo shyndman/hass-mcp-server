@@ -813,8 +813,8 @@ class TestConfigCategoryAssignment:
         assert "No category named 'Nope'" in result["content"][0]["text"]
         create_mock.assert_not_called()
 
-    async def test_update_automation_empty_category_clears_scope(self):
-        """Passing an empty category clears the automation scope on the entity."""
+    async def test_update_automation_null_category_clears_scope(self):
+        """Passing a null category clears the automation scope on the entity."""
         from custom_components.mcp_server_http_transport.tools.config import update_automation
 
         ent_reg = Mock()
@@ -827,7 +827,7 @@ class TestConfigCategoryAssignment:
         ):
             result = await update_automation(
                 Mock(),
-                {"automation_id": "entry-id", "config": {"alias": "X"}, "category": ""},
+                {"automation_id": "entry-id", "config": {"alias": "X"}, "category": None},
             )
 
         _, kwargs = ent_reg.async_update_entity.call_args
@@ -879,8 +879,8 @@ class TestConfigCategoryAssignment:
         assert "No category named 'Nope'" in result["content"][0]["text"]
         create_mock.assert_not_called()
 
-    async def test_update_scene_empty_category_clears_scope(self):
-        """Passing an empty category clears the scene scope on the entity."""
+    async def test_update_scene_null_category_clears_scope(self):
+        """Passing a null category clears the scene scope on the entity."""
         from custom_components.mcp_server_http_transport.tools.config import update_scene
 
         ent_reg = Mock()
@@ -893,7 +893,7 @@ class TestConfigCategoryAssignment:
         ):
             result = await update_scene(
                 Mock(),
-                {"scene_id": "entry-id", "config": {"name": "X"}, "category": ""},
+                {"scene_id": "entry-id", "config": {"name": "X"}, "category": None},
             )
 
         ent_reg.async_get_entity_id.assert_called_once_with("scene", "homeassistant", "entry-id")
@@ -958,8 +958,8 @@ class TestConfigCategoryAssignment:
         assert "is not registered yet; category not applied." in result["content"][0]["text"]
         ent_reg.async_update_entity.assert_not_called()
 
-    async def test_update_script_empty_category_clears_scope(self):
-        """Passing an empty category clears the script scope on the entity."""
+    async def test_update_script_null_category_clears_scope(self):
+        """Passing a null category clears the script scope on the entity."""
         from custom_components.mcp_server_http_transport.tools.config import update_script
 
         ent_reg = Mock()
@@ -971,7 +971,7 @@ class TestConfigCategoryAssignment:
         ):
             result = await update_script(
                 Mock(),
-                {"key": "myscript", "config": {"alias": "X"}, "category": ""},
+                {"key": "myscript", "config": {"alias": "X"}, "category": None},
             )
 
         ent_reg.async_get.assert_has_calls([call("script.myscript"), call("script.myscript")])

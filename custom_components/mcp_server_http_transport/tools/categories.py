@@ -177,6 +177,12 @@ async def update_category(hass: HomeAssistant, arguments: dict[str, Any]) -> dic
                     }
                 ]
             }
+        if "name" not in arguments and "icon" not in arguments:
+            return {
+                "content": [
+                    {"type": "text", "text": "Nothing to update: provide name and/or icon."}
+                ]
+            }
         kwargs: dict[str, Any] = {}
         if "name" in arguments:
             kwargs["name"] = arguments["name"]

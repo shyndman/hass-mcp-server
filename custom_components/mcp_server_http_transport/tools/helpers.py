@@ -190,7 +190,7 @@ async def get_helper_config(hass: HomeAssistant, arguments: dict[str, Any]) -> d
                 ),
             },
             "category": {
-                "type": "string",
+                "type": ["string", "null"],
                 "description": (
                     "Category name to assign this helper to. "
                     "Must already exist (use create_category)."
@@ -220,7 +220,9 @@ async def create_helper(hass: HomeAssistant, arguments: dict[str, Any]) -> dict[
 
     try:
         category = arguments.get("category")
-        category_id = resolve_category_id(hass, "entity", category) if category else None
+        category_id = (
+            resolve_category_id(hass, "entity", category) if category is not None else None
+        )
         collection = _get_collection(hass, domain)
         item = await collection.async_create_item(config)
         if category_id is not None:
@@ -268,11 +270,11 @@ async def create_helper(hass: HomeAssistant, arguments: dict[str, Any]) -> dict[
                 ),
             },
             "category": {
-                "type": "string",
+                "type": ["string", "null"],
                 "description": (
                     "Category name to assign this helper to. "
                     "Must already exist (use create_category). "
-                    "Pass null/empty to remove the category."
+                    "Pass null to remove the category."
                 ),
             },
         },
@@ -285,7 +287,9 @@ async def update_helper(hass: HomeAssistant, arguments: dict[str, Any]) -> dict[
         has_cat = "category" in arguments
         category = arguments.get("category")
         category_id = (
-            resolve_category_id(hass, "entity", category) if (has_cat and category) else None
+            resolve_category_id(hass, "entity", category)
+            if (has_cat and category is not None)
+            else None
         )
         entity_id = arguments["entity_id"]
         domain, item_id = await _entity_id_to_item_id(hass, entity_id)

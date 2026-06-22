@@ -148,7 +148,7 @@ For local agents or MCP clients that can't run an OAuth browser flow, you can au
 | `update_category` | Rename or change the icon of a category |
 | `delete_category` | Delete a category (HA clears it from all assigned entities) |
 
-Assign objects to categories by passing the optional `category` (category name) argument to `create_automation`/`update_automation`, `create_scene`/`update_scene`, `create_script`/`update_script`, and `create_helper`/`update_helper`; on the update tools, pass an empty/null `category` to remove it.
+Assign objects to categories by passing the optional `category` (category name) argument to `create_automation`/`update_automation`, `create_scene`/`update_scene`, `create_script`/`update_script`, and `create_helper`/`update_helper`; on the update tools, pass a null `category` to remove it.
 
 **Config Files**
 

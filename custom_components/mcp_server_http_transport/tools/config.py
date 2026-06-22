@@ -25,11 +25,11 @@ from .categories import resolve_category_id, write_entity_category
                 ),
             },
             "category": {
-                "type": "string",
+                "type": ["string", "null"],
                 "description": (
                     "Category name to assign this automation to (scope: automation). "
                     "The category must already exist (use create_category). "
-                    "On update, pass null/empty to remove the category."
+                    "On update, pass null to remove the category."
                 ),
             },
         },
@@ -42,7 +42,9 @@ async def create_automation(hass: HomeAssistant, arguments: dict[str, Any]) -> d
 
     try:
         category = arguments.get("category")
-        category_id = resolve_category_id(hass, "automation", category) if category else None
+        category_id = (
+            resolve_category_id(hass, "automation", category) if category is not None else None
+        )
         entry_id = await create_list_entry(
             hass, "automations.yaml", arguments["config"], "automation"
         )
@@ -88,11 +90,11 @@ async def create_automation(hass: HomeAssistant, arguments: dict[str, Any]) -> d
                 " (alias, trigger, action, condition, mode, etc.)",
             },
             "category": {
-                "type": "string",
+                "type": ["string", "null"],
                 "description": (
                     "Category name to assign this automation to (scope: automation). "
                     "The category must already exist (use create_category). "
-                    "On update, pass null/empty to remove the category."
+                    "On update, pass null to remove the category."
                 ),
             },
         },
@@ -107,7 +109,9 @@ async def update_automation(hass: HomeAssistant, arguments: dict[str, Any]) -> d
         has_cat = "category" in arguments
         category = arguments.get("category")
         category_id = (
-            resolve_category_id(hass, "automation", category) if (has_cat and category) else None
+            resolve_category_id(hass, "automation", category)
+            if (has_cat and category is not None)
+            else None
         )
         await update_list_entry(
             hass,
@@ -223,11 +227,11 @@ async def get_automation_config(hass: HomeAssistant, arguments: dict[str, Any]) 
                 "description": "Scene configuration (name, entities, etc.)",
             },
             "category": {
-                "type": "string",
+                "type": ["string", "null"],
                 "description": (
                     "Category name to assign this scene to (scope: scene). "
                     "The category must already exist (use create_category). "
-                    "On update, pass null/empty to remove the category."
+                    "On update, pass null to remove the category."
                 ),
             },
         },
@@ -240,7 +244,9 @@ async def create_scene(hass: HomeAssistant, arguments: dict[str, Any]) -> dict[s
 
     try:
         category = arguments.get("category")
-        category_id = resolve_category_id(hass, "scene", category) if category else None
+        category_id = (
+            resolve_category_id(hass, "scene", category) if category is not None else None
+        )
         entry_id = await create_list_entry(hass, "scenes.yaml", arguments["config"], "scene")
         if category_id is not None:
             entity_id = er.async_get(hass).async_get_entity_id("scene", "homeassistant", entry_id)
@@ -280,11 +286,11 @@ async def create_scene(hass: HomeAssistant, arguments: dict[str, Any]) -> dict[s
                 "description": "Updated scene configuration (name, entities, etc.)",
             },
             "category": {
-                "type": "string",
+                "type": ["string", "null"],
                 "description": (
                     "Category name to assign this scene to (scope: scene). "
                     "The category must already exist (use create_category). "
-                    "On update, pass null/empty to remove the category."
+                    "On update, pass null to remove the category."
                 ),
             },
         },
@@ -299,7 +305,9 @@ async def update_scene(hass: HomeAssistant, arguments: dict[str, Any]) -> dict[s
         has_cat = "category" in arguments
         category = arguments.get("category")
         category_id = (
-            resolve_category_id(hass, "scene", category) if (has_cat and category) else None
+            resolve_category_id(hass, "scene", category)
+            if (has_cat and category is not None)
+            else None
         )
         await update_list_entry(
             hass, "scenes.yaml", arguments["scene_id"], arguments["config"], "scene"
@@ -415,11 +423,11 @@ async def get_scene_config(hass: HomeAssistant, arguments: dict[str, Any]) -> di
                 "description": "Script configuration (alias, sequence, mode, etc.)",
             },
             "category": {
-                "type": "string",
+                "type": ["string", "null"],
                 "description": (
                     "Category name to assign this script to (scope: script). "
                     "The category must already exist (use create_category). "
-                    "On update, pass null/empty to remove the category."
+                    "On update, pass null to remove the category."
                 ),
             },
         },
@@ -432,7 +440,9 @@ async def create_script(hass: HomeAssistant, arguments: dict[str, Any]) -> dict[
 
     try:
         category = arguments.get("category")
-        category_id = resolve_category_id(hass, "script", category) if category else None
+        category_id = (
+            resolve_category_id(hass, "script", category) if category is not None else None
+        )
         key = await create_dict_entry(
             hass, "scripts.yaml", arguments["key"], arguments["config"], "script"
         )
@@ -474,11 +484,11 @@ async def create_script(hass: HomeAssistant, arguments: dict[str, Any]) -> dict[
                 "description": "Updated script configuration (alias, sequence, mode, etc.)",
             },
             "category": {
-                "type": "string",
+                "type": ["string", "null"],
                 "description": (
                     "Category name to assign this script to (scope: script). "
                     "The category must already exist (use create_category). "
-                    "On update, pass null/empty to remove the category."
+                    "On update, pass null to remove the category."
                 ),
             },
         },
@@ -493,7 +503,9 @@ async def update_script(hass: HomeAssistant, arguments: dict[str, Any]) -> dict[
         has_cat = "category" in arguments
         category = arguments.get("category")
         category_id = (
-            resolve_category_id(hass, "script", category) if (has_cat and category) else None
+            resolve_category_id(hass, "script", category)
+            if (has_cat and category is not None)
+            else None
         )
         await update_dict_entry(
             hass, "scripts.yaml", arguments["key"], arguments["config"], "script"
