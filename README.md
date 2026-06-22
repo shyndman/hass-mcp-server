@@ -139,6 +139,16 @@ For local agents or MCP clients that can't run an OAuth browser flow, you can au
 | `update_helper` | Update an existing UI-managed helper by entity ID (experimental) |
 | `delete_helper` | Delete a UI-managed helper by entity ID (experimental) |
 
+**Template Entities**
+
+| Tool | Description |
+|------|-------------|
+| `list_template_entities` | List state-based template entities created via the UI helper flow, optionally filtered by type |
+| `get_template_entity` | Get the stored configuration of a template entity by entity ID |
+| `create_template_entity` | Create a state-based template entity (sensor, binary_sensor, switch, light, number, etc.) (experimental) |
+| `update_template_entity` | Update a template entity's fields by entity ID; name and type are immutable (experimental) |
+| `delete_template_entity` | Delete a template entity by entity ID (experimental) |
+
 **Categories**
 
 | Tool | Description |
@@ -148,7 +158,7 @@ For local agents or MCP clients that can't run an OAuth browser flow, you can au
 | `update_category` | Rename or change the icon of a category |
 | `delete_category` | Delete a category (HA clears it from all assigned entities) |
 
-Assign objects to categories by passing the optional `category` (category name) argument to `create_automation`/`update_automation`, `create_scene`/`update_scene`, `create_script`/`update_script`, and `create_helper`/`update_helper`; on the update tools, pass a null `category` to remove it.
+Assign objects to categories by passing the optional `category` (category name) argument to `create_automation`/`update_automation`, `create_scene`/`update_scene`, `create_script`/`update_script`, `create_helper`/`update_helper`, and `create_template_entity`/`update_template_entity`; on the update tools, pass a null `category` to remove it.
 
 **Config Files**
 
@@ -355,6 +365,28 @@ delete_helper(entity_id="counter.motion_events")
 ```
 
 > **Note:** These tools only manage UI-created helpers stored in Home Assistant's `.storage/` files. Helpers defined in YAML configuration are read-only from the perspective of these tools.
+</details>
+
+<details>
+<summary>How do I create template entities (template sensors, switches, etc.)?</summary>
+
+These tools manage **state-based** template entities through Home Assistant's UI config-entry helper flow — the same ones you'd add under Settings → Devices & Services → Helpers → Template. Trigger-based templates are YAML-only; edit them with the config-file tools instead.
+
+Create one by passing the `template_type` and a `config` with `name` plus the platform's fields:
+
+```json
+create_template_entity(template_type="sensor", config={"name": "Comfort Index", "state": "{{ states('sensor.temp')|float + 5 }}", "unit_of_measurement": "°C"})
+create_template_entity(template_type="binary_sensor", config={"name": "Too Hot", "state": "{{ states('sensor.temp')|float > 26 }}"})
+```
+
+List, update, or delete by entity ID (`update_template_entity` changes the template fields only — `name` and `template_type` are fixed):
+
+```json
+list_template_entities()                                  // all template entities
+list_template_entities(template_type="binary_sensor")     // only binary sensors
+update_template_entity(entity_id="sensor.comfort_index", config={"state": "{{ states('sensor.temp')|float + 3 }}"})
+delete_template_entity(entity_id="sensor.comfort_index")
+```
 </details>
 
 <details>
