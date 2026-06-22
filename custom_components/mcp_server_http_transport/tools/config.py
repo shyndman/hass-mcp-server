@@ -244,9 +244,7 @@ async def create_scene(hass: HomeAssistant, arguments: dict[str, Any]) -> dict[s
 
     try:
         category = arguments.get("category")
-        category_id = (
-            resolve_category_id(hass, "scene", category) if category is not None else None
-        )
+        category_id = resolve_category_id(hass, "scene", category) if category is not None else None
         entry_id = await create_list_entry(hass, "scenes.yaml", arguments["config"], "scene")
         if category_id is not None:
             entity_id = er.async_get(hass).async_get_entity_id("scene", "homeassistant", entry_id)
