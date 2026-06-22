@@ -168,4 +168,5 @@ from . import (  # noqa: E402
     system,  # noqa: F401
     system_admin,  # noqa: F401
     traces,  # noqa: F401
+    template,  # noqa: F401
 )
