@@ -169,6 +169,17 @@ Deleting the built-in integration's config entry does not release the path on it
 | `update_helper` | Update an existing UI-managed helper by entity ID (experimental) |
 | `delete_helper` | Delete a UI-managed helper by entity ID (experimental) |
 
+**Categories**
+
+| Tool | Description |
+|------|-------------|
+| `list_categories` | List categories in a scope (automation, script, scene, entity) |
+| `create_category` | Create a category in a scope |
+| `update_category` | Rename or change the icon of a category |
+| `delete_category` | Delete a category (HA clears it from all assigned entities) |
+
+Assign objects to categories by passing the optional `category` (category name) argument to `create_automation`/`update_automation`, `create_scene`/`update_scene`, `create_script`/`update_script`, and `create_helper`/`update_helper`; on the update tools, pass a null `category` to remove it.
+
 **Config Files**
 
 | Tool | Description |
