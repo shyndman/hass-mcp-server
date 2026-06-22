@@ -1,6 +1,4 @@
 {
   "name": "MCP Server (HTTP Transport)",
-  "render_readme": true,
-  "zip_release": true,
-  "filename": "mcp_server_http_transport.zip"
+  "render_readme": true
 }
