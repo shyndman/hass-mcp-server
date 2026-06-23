@@ -1,11 +1,15 @@
 """Tests for helper entity CRUD tools."""
 
+import asyncio
 import json
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
+from custom_components.mcp_server_http_transport.const import DOMAIN
 from custom_components.mcp_server_http_transport.http import MCPEndpointView
+
+_TEST_SID = "test-session-id"
 
 
 def _make_state(entity_id: str, state: str = "on", attributes: dict | None = None) -> Mock:
@@ -544,8 +548,9 @@ class TestHelperToolsViaHTTP:
     @pytest.fixture
     def mock_hass(self):
         hass = Mock()
-        # DOMAIN key must be truthy so _integration_loaded() passes
-        hass.data = {"mcp_server_http_transport": Mock()}
+        hass.data = {
+            DOMAIN: {"mcp_sessions": {_TEST_SID: {"queue": asyncio.Queue(), "uris": set()}}}
+        }
         hass.states = Mock()
         hass.services = Mock()
         return hass
@@ -556,7 +561,7 @@ class TestHelperToolsViaHTTP:
 
     def _make_request(self, method: str, params: dict, request_id: int = 1) -> Mock:
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",

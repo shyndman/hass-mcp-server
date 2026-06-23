@@ -15,8 +15,7 @@ _LOGGER = logging.getLogger(__name__)
 @register_prompt(
     name="schedule_optimizer",
     description=(
-        "Analyze automation schedules and entity history "
-        "to suggest timing or grouping improvements"
+        "Analyze automation schedules and entity history to suggest timing or grouping improvements"
     ),
     arguments=[
         {

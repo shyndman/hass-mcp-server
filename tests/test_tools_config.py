@@ -1,11 +1,15 @@
 """Tests for automation/scene/script config tools."""
 
+import asyncio
 import json
 from unittest.mock import AsyncMock, Mock, call, patch
 
 import pytest
 
+from custom_components.mcp_server_http_transport.const import DOMAIN
 from custom_components.mcp_server_http_transport.http import MCPEndpointView
+
+_TEST_SID = "test-session-id"
 
 
 class TestToolsConfig:
@@ -22,6 +26,9 @@ class TestToolsConfig:
         hass = Mock()
         hass.states = Mock()
         hass.services = Mock()
+        hass.data = {
+            DOMAIN: {"mcp_sessions": {_TEST_SID: {"queue": asyncio.Queue(), "uris": set()}}}
+        }
         return hass
 
     @pytest.fixture
@@ -38,7 +45,7 @@ class TestToolsConfig:
         config = {"alias": "Test Automation", "trigger": [], "action": []}
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -84,7 +91,7 @@ class TestToolsConfig:
         mock_hass.async_add_executor_job = AsyncMock(side_effect=run_fn)
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -121,7 +128,7 @@ class TestToolsConfig:
         mock_hass.async_add_executor_job = AsyncMock(side_effect=run_fn)
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -163,7 +170,7 @@ class TestToolsConfig:
         mock_hass.async_add_executor_job = AsyncMock(side_effect=run_fn)
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -203,7 +210,7 @@ class TestToolsConfig:
         mock_hass.async_add_executor_job = AsyncMock(side_effect=run_fn)
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -242,7 +249,7 @@ class TestToolsConfig:
         mock_hass.async_add_executor_job = AsyncMock(side_effect=run_fn)
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -279,7 +286,7 @@ class TestToolsConfig:
         mock_hass.async_add_executor_job = AsyncMock(side_effect=run_fn)
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -325,7 +332,7 @@ class TestToolsConfig:
         mock_hass.async_add_executor_job = AsyncMock(side_effect=run_fn)
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -368,7 +375,7 @@ class TestToolsConfig:
         mock_hass.async_add_executor_job = AsyncMock(side_effect=run_fn)
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -407,7 +414,7 @@ class TestToolsConfig:
         mock_hass.async_add_executor_job = AsyncMock(side_effect=run_fn)
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -443,7 +450,7 @@ class TestToolsConfig:
         mock_hass.async_add_executor_job = AsyncMock(side_effect=run_fn)
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -482,7 +489,7 @@ class TestToolsConfig:
         mock_hass.async_add_executor_job = AsyncMock(side_effect=run_fn)
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -519,7 +526,7 @@ class TestToolsConfig:
         mock_hass.async_add_executor_job = AsyncMock(side_effect=run_fn)
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -562,7 +569,7 @@ class TestToolsConfig:
         mock_hass.async_add_executor_job = AsyncMock(side_effect=run_fn)
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -602,7 +609,7 @@ class TestToolsConfig:
         mock_hass.async_add_executor_job = AsyncMock(side_effect=run_fn)
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -644,7 +651,7 @@ class TestToolsConfig:
         mock_hass.async_add_executor_job = AsyncMock(side_effect=run_fn)
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -684,7 +691,7 @@ class TestToolsConfig:
         mock_hass.async_add_executor_job = AsyncMock(side_effect=run_fn)
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -723,7 +730,7 @@ class TestToolsConfig:
         mock_hass.async_add_executor_job = AsyncMock(side_effect=run_fn)
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",

@@ -1,11 +1,15 @@
 """Tests for statistics tools."""
 
+import asyncio
 import json
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
+from custom_components.mcp_server_http_transport.const import DOMAIN
 from custom_components.mcp_server_http_transport.http import MCPEndpointView
+
+_TEST_SID = "test-session-id"
 
 
 class TestToolsStatistics:
@@ -22,6 +26,9 @@ class TestToolsStatistics:
         hass = Mock()
         hass.states = Mock()
         hass.services = Mock()
+        hass.data = {
+            DOMAIN: {"mcp_sessions": {_TEST_SID: {"queue": asyncio.Queue(), "uris": set()}}}
+        }
         return hass
 
     @pytest.fixture
@@ -52,7 +59,7 @@ class TestToolsStatistics:
         mock_recorder.async_add_executor_job = AsyncMock(return_value=mock_stats)
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -86,7 +93,7 @@ class TestToolsStatistics:
     async def test_post_tools_call_get_statistics_invalid_period(self, view, mock_hass):
         """Test POST with tools/call for get_statistics with invalid period."""
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -117,7 +124,7 @@ class TestToolsStatistics:
         mock_recorder.async_add_executor_job = AsyncMock(side_effect=Exception("Recorder error"))
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",

@@ -1,12 +1,16 @@
 """Tests for MCP resource endpoints."""
 
+import asyncio
 import json
 from datetime import datetime
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
+from custom_components.mcp_server_http_transport.const import DOMAIN
 from custom_components.mcp_server_http_transport.http import MCPEndpointView
+
+_TEST_SID = "test-session-id"
 
 
 class TestResources:
@@ -23,6 +27,9 @@ class TestResources:
         hass = Mock()
         hass.states = Mock()
         hass.services = Mock()
+        hass.data = {
+            DOMAIN: {"mcp_sessions": {_TEST_SID: {"queue": asyncio.Queue(), "uris": set()}}}
+        }
         return hass
 
     @pytest.fixture
@@ -33,7 +40,7 @@ class TestResources:
     async def test_post_resources_list(self, view):
         """Test POST with resources/list request."""
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={"jsonrpc": "2.0", "method": "resources/list", "id": 22}
         )
@@ -72,7 +79,7 @@ class TestResources:
         mock_hass.config.language = "en"
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -104,7 +111,7 @@ class TestResources:
         mock_registry.async_list_areas.return_value = [mock_area]
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -141,7 +148,7 @@ class TestResources:
         mock_hass.states.get.return_value = mock_state
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -166,7 +173,7 @@ class TestResources:
         mock_hass.states.get.return_value = None
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -188,7 +195,7 @@ class TestResources:
     async def test_post_resources_read_unknown_uri(self, view, mock_hass):
         """Test POST with resources/read for unknown URI."""
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -220,7 +227,7 @@ class TestResources:
         mock_registry.devices = {"device1": mock_device}
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -254,7 +261,7 @@ class TestResources:
         }
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -286,7 +293,7 @@ class TestResources:
         mock_registry.async_list_floors.return_value = [mock_floor]
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -326,7 +333,7 @@ class TestResources:
         mock_hass.states.async_all.return_value = [mock_state1, mock_state2]
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -361,7 +368,7 @@ class TestResources:
         mock_hass.states.async_all.return_value = [mock_state1, mock_state2]
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -393,7 +400,7 @@ class TestResources:
         mock_registry.async_list_labels.return_value = [mock_label]
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -430,7 +437,7 @@ class TestResources:
         mock_hass.config_entries.async_entries.return_value = [mock_entry]
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",

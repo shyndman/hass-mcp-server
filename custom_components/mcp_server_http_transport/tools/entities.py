@@ -307,7 +307,7 @@ async def list_services(hass: HomeAssistant, arguments: dict[str, Any]) -> dict[
             "query": {
                 "type": "string",
                 "description": (
-                    "Search query to match against entity IDs, " "friendly names, and aliases"
+                    "Search query to match against entity IDs, friendly names, and aliases"
                 ),
             },
             "device_class": {

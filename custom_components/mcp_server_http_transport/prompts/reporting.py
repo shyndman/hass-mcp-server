@@ -44,7 +44,7 @@ async def daily_summary(hass: HomeAssistant, arguments: dict[str, Any]) -> dict[
     except Exception:
         _LOGGER.exception("Error retrieving history for daily summary")
         summary_text = (
-            "Unable to retrieve history data. " "The recorder component may not be available."
+            "Unable to retrieve history data. The recorder component may not be available."
         )
 
     return {

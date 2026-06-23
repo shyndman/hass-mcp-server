@@ -156,8 +156,7 @@ async def change_validator(hass: HomeAssistant, arguments: dict[str, Any]) -> di
             elif ct == "scene":
                 entries = await read_list_entries(hass, "scenes.yaml")
                 sections.append(
-                    f"**Scenes ({len(entries)}):**\n"
-                    f"```json\n{json.dumps(entries, indent=2)}\n```"
+                    f"**Scenes ({len(entries)}):**\n```json\n{json.dumps(entries, indent=2)}\n```"
                 )
         except Exception:
             _LOGGER.debug("Could not read %s config for change validator", ct)

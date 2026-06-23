@@ -11,7 +11,10 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
-from custom_components.mcp_server_http_transport.http import MCPEndpointView
+from custom_components.mcp_server_http_transport.const import DOMAIN
+from custom_components.mcp_server_http_transport.http import MCPEndpointView, _new_session
+
+_TEST_SID = "test-session-id"
 
 
 @pytest.fixture
@@ -107,6 +110,7 @@ def populated_hass():
     hass.config.country = "SE"
     hass.config.language = "sv"
 
+    hass.data = {DOMAIN: {"mcp_sessions": {_TEST_SID: _new_session()}}}
     return hass
 
 
@@ -224,7 +228,7 @@ class TestMCPClientSession:
             body["params"] = params
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(return_value=body)
 
         with patch.object(view, "_validate_token", return_value={"sub": "user123"}):
@@ -236,7 +240,7 @@ class TestMCPClientSession:
         """Test a complete MCP session: initialize → discover → use."""
         # Step 1: Initialize
         result = await self._call(view, "initialize")
-        assert result["result"]["protocolVersion"] == "2024-11-05"
+        assert result["result"]["protocolVersion"] == "2025-03-26"
         caps = result["result"]["capabilities"]
         assert "tools" in caps
         assert "resources" in caps
@@ -750,7 +754,7 @@ class TestMCPClientSession:
     async def test_unknown_tool_returns_error(self, view):
         """Test calling a nonexistent tool returns a proper error."""
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -778,7 +782,7 @@ class TestMCPClientSession:
     async def test_notification_without_id_returns_202(self, view):
         """Test JSON-RPC notification (no id) returns 202."""
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={"jsonrpc": "2.0", "method": "notifications/initialized"}
         )
@@ -1184,7 +1188,10 @@ class TestMCPClientSession:
         lovelace_data.dashboards = {"energy": mock_dashboard}
         populated_hass.data = {
             "lovelace": lovelace_data,
-            "mcp_server_http_transport": {"server": Mock()},
+            "mcp_server_http_transport": {
+                "server": Mock(),
+                "mcp_sessions": {_TEST_SID: _new_session()},
+            },
         }
 
         # Get (empty)

@@ -1,15 +1,19 @@
 """Tests for system admin tool endpoints."""
 
+import asyncio
 import json
 import tempfile
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
+from custom_components.mcp_server_http_transport.const import DOMAIN
 from custom_components.mcp_server_http_transport.http import MCPEndpointView
 from custom_components.mcp_server_http_transport.tools.system_admin import (
     _format_system_log_entry,
 )
+
+_TEST_SID = "test-session-id"
 
 
 class TestToolsSystemAdmin:
@@ -26,6 +30,9 @@ class TestToolsSystemAdmin:
         hass = Mock()
         hass.states = Mock()
         hass.services = Mock()
+        hass.data = {
+            DOMAIN: {"mcp_sessions": {_TEST_SID: {"queue": asyncio.Queue(), "uris": set()}}}
+        }
         return hass
 
     @pytest.fixture
@@ -41,7 +48,7 @@ class TestToolsSystemAdmin:
         )
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -66,7 +73,7 @@ class TestToolsSystemAdmin:
         mock_hass.async_add_executor_job = AsyncMock(return_value="Last line only\n")
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -88,11 +95,13 @@ class TestToolsSystemAdmin:
         """Test POST with tools/call for get_error_log when file is missing."""
         mock_hass.config.path.return_value = "/config/home-assistant.log"
         # Integration loaded, but no system_log buffer available.
-        mock_hass.data = {"mcp_server_http_transport": True}
+        mock_hass.data = {
+            DOMAIN: {"mcp_sessions": {_TEST_SID: {"queue": asyncio.Queue(), "uris": set()}}}
+        }
         mock_hass.async_add_executor_job = AsyncMock(side_effect=FileNotFoundError())
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -115,7 +124,7 @@ class TestToolsSystemAdmin:
         mock_hass.services.async_call = AsyncMock()
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -139,7 +148,7 @@ class TestToolsSystemAdmin:
     async def test_post_tools_call_restart_ha_not_confirmed(self, view, mock_hass):
         """Test POST with tools/call for restart_ha with confirm=false."""
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -163,7 +172,7 @@ class TestToolsSystemAdmin:
     async def test_post_tools_call_restart_ha_missing_confirm(self, view, mock_hass):
         """Test POST with tools/call for restart_ha without confirm argument."""
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -201,7 +210,7 @@ class TestToolsSystemAdmin:
         mock_hass.config_entries.async_entries.return_value = [mock_entry, mock_entry]
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -245,7 +254,7 @@ class TestToolsSystemAdmin:
         mock_hass.states.async_all.return_value = [mock_state1, mock_state2, mock_state3]
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -279,7 +288,7 @@ class TestToolsSystemAdmin:
         mock_hass.states.async_all.return_value = [mock_state]
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -306,7 +315,7 @@ class TestToolsSystemAdmin:
         mock_result.errors = []
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -338,7 +347,7 @@ class TestToolsSystemAdmin:
         mock_result.errors = ["Invalid automation config", "Missing entity"]
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -381,7 +390,7 @@ class TestToolsSystemAdmin:
         mock_hass.config_entries.async_entries.return_value = [mock_entry1, mock_entry2]
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -408,7 +417,7 @@ class TestToolsSystemAdmin:
         mock_hass.async_add_executor_job = AsyncMock(side_effect=Exception("IO error"))
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -440,7 +449,7 @@ class TestToolsSystemAdmin:
         mock_hass.async_add_executor_job = AsyncMock(side_effect=run_fn)
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -463,7 +472,9 @@ class TestToolsSystemAdmin:
         """Test get_error_log when log file does not exist (FileNotFoundError)."""
         mock_hass.config.path.return_value = "/nonexistent/path/home-assistant.log"
         # Integration loaded, but no system_log buffer available.
-        mock_hass.data = {"mcp_server_http_transport": True}
+        mock_hass.data = {
+            DOMAIN: {"mcp_sessions": {_TEST_SID: {"queue": asyncio.Queue(), "uris": set()}}}
+        }
 
         async def run_fn(fn, *args):
             return fn(*args) if args else fn()
@@ -471,7 +482,7 @@ class TestToolsSystemAdmin:
         mock_hass.async_add_executor_job = AsyncMock(side_effect=run_fn)
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -510,11 +521,14 @@ class TestToolsSystemAdmin:
                 "first_occurred": 1_700_000_000.0,
             }
         ]
-        mock_hass.data = {"mcp_server_http_transport": True, "system_log": handler}
+        mock_hass.data = {
+            DOMAIN: {"mcp_sessions": {_TEST_SID: {"queue": asyncio.Queue(), "uris": set()}}},
+            "system_log": handler,
+        }
         mock_hass.async_add_executor_job = AsyncMock(side_effect=FileNotFoundError())
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -542,11 +556,14 @@ class TestToolsSystemAdmin:
         mock_hass.config.path.return_value = "/nonexistent/home-assistant.log"
         handler = Mock()
         handler.records.to_list.return_value = []
-        mock_hass.data = {"mcp_server_http_transport": True, "system_log": handler}
+        mock_hass.data = {
+            DOMAIN: {"mcp_sessions": {_TEST_SID: {"queue": asyncio.Queue(), "uris": set()}}},
+            "system_log": handler,
+        }
         mock_hass.async_add_executor_job = AsyncMock(side_effect=FileNotFoundError())
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -570,11 +587,14 @@ class TestToolsSystemAdmin:
         mock_hass.config.path.return_value = "/nonexistent/home-assistant.log"
         handler = Mock()
         handler.records.to_list.side_effect = RuntimeError("buffer exploded")
-        mock_hass.data = {"mcp_server_http_transport": True, "system_log": handler}
+        mock_hass.data = {
+            DOMAIN: {"mcp_sessions": {_TEST_SID: {"queue": asyncio.Queue(), "uris": set()}}},
+            "system_log": handler,
+        }
         mock_hass.async_add_executor_job = AsyncMock(side_effect=FileNotFoundError())
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -598,7 +618,7 @@ class TestToolsSystemAdmin:
         mock_hass.services.async_call = AsyncMock(side_effect=Exception("Service error"))
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -619,7 +639,7 @@ class TestToolsSystemAdmin:
     async def test_post_tools_call_check_config_error(self, view, mock_hass):
         """Test check_config when async_check_ha_config_file raises."""
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",

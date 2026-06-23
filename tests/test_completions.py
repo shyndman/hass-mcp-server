@@ -1,11 +1,15 @@
 """Tests for completion endpoints."""
 
+import asyncio
 import json
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
+from custom_components.mcp_server_http_transport.const import DOMAIN
 from custom_components.mcp_server_http_transport.http import MCPEndpointView
+
+_TEST_SID = "test-session-id"
 
 
 class TestCompletions:
@@ -22,6 +26,9 @@ class TestCompletions:
         hass = Mock()
         hass.states = Mock()
         hass.services = Mock()
+        hass.data = {
+            DOMAIN: {"mcp_sessions": {_TEST_SID: {"queue": asyncio.Queue(), "uris": set()}}}
+        }
         return hass
 
     @pytest.fixture
@@ -40,7 +47,7 @@ class TestCompletions:
         mock_hass.states.async_all.return_value = [mock_state1, mock_state2, mock_state3]
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -72,7 +79,7 @@ class TestCompletions:
         mock_hass.states.async_all.return_value = [mock_state1, mock_state2]
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -102,7 +109,7 @@ class TestCompletions:
         }
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -136,7 +143,7 @@ class TestCompletions:
         mock_registry.async_list_areas.return_value = [mock_area1, mock_area2]
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -167,7 +174,7 @@ class TestCompletions:
     async def test_post_completion_unknown_argument(self, view, mock_hass):
         """Test POST with completion/complete for unknown argument."""
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -200,7 +207,7 @@ class TestCompletions:
         mock_hass.states.async_all.return_value = [mock_state1, mock_state2, mock_state3]
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -226,7 +233,7 @@ class TestCompletions:
     async def test_post_completion_trigger_type(self, view, mock_hass):
         """Test POST with completion/complete for trigger_type argument."""
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -251,7 +258,7 @@ class TestCompletions:
     async def test_post_completion_period(self, view, mock_hass):
         """Test POST with completion/complete for period argument."""
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -277,7 +284,7 @@ class TestCompletions:
     async def test_post_completion_config_type(self, view, mock_hass):
         """Test POST with completion/complete for config_type argument."""
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -315,7 +322,7 @@ class TestCompletions:
         mock_hass.async_add_executor_job = AsyncMock(side_effect=run_fn)
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -352,7 +359,7 @@ class TestCompletions:
         mock_hass.states.async_all.return_value = [mock_state1, mock_state2]
 
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",

@@ -1,11 +1,15 @@
 """Tests for dashboard tools."""
 
+import asyncio
 import json
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
+from custom_components.mcp_server_http_transport.const import DOMAIN
 from custom_components.mcp_server_http_transport.http import MCPEndpointView
+
+_TEST_SID = "test-session-id"
 
 
 class TestToolsDashboards:
@@ -22,6 +26,9 @@ class TestToolsDashboards:
         hass = Mock()
         hass.states = Mock()
         hass.services = Mock()
+        hass.data = {
+            DOMAIN: {"mcp_sessions": {_TEST_SID: {"queue": asyncio.Queue(), "uris": set()}}}
+        }
         return hass
 
     @pytest.fixture
@@ -32,7 +39,7 @@ class TestToolsDashboards:
     async def test_post_tools_call_list_dashboards(self, view, mock_hass):
         """Test POST with tools/call for list_dashboards."""
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -65,7 +72,7 @@ class TestToolsDashboards:
     async def test_post_tools_call_list_dashboards_error(self, view, mock_hass):
         """Test POST with tools/call for list_dashboards when it fails."""
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -92,7 +99,7 @@ class TestToolsDashboards:
     async def test_post_tools_call_get_dashboard_config(self, view, mock_hass):
         """Test POST with tools/call for get_dashboard_config."""
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -125,7 +132,7 @@ class TestToolsDashboards:
     async def test_post_tools_call_get_dashboard_config_not_found(self, view, mock_hass):
         """Test POST with tools/call for get_dashboard_config when dashboard not found."""
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -155,7 +162,7 @@ class TestToolsDashboards:
     async def test_post_tools_call_save_dashboard_config(self, view, mock_hass):
         """Test POST with tools/call for save_dashboard_config."""
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -187,7 +194,7 @@ class TestToolsDashboards:
     async def test_post_tools_call_save_dashboard_config_error(self, view, mock_hass):
         """Test POST with tools/call for save_dashboard_config when it fails."""
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -220,7 +227,7 @@ class TestToolsDashboards:
     async def test_post_tools_call_delete_dashboard_config(self, view, mock_hass):
         """Test POST with tools/call for delete_dashboard_config."""
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -249,7 +256,7 @@ class TestToolsDashboards:
     async def test_post_tools_call_delete_dashboard_config_error(self, view, mock_hass):
         """Test POST with tools/call for delete_dashboard_config when it fails."""
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -279,7 +286,7 @@ class TestToolsDashboards:
     async def test_post_tools_call_create_dashboard(self, view, mock_hass):
         """Test POST with tools/call for create_dashboard."""
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -315,7 +322,7 @@ class TestToolsDashboards:
     async def test_post_tools_call_create_dashboard_error(self, view, mock_hass):
         """Test POST with tools/call for create_dashboard when it fails."""
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -348,7 +355,7 @@ class TestToolsDashboards:
     async def test_post_tools_call_update_dashboard(self, view, mock_hass):
         """Test POST with tools/call for update_dashboard."""
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -383,7 +390,7 @@ class TestToolsDashboards:
     async def test_post_tools_call_update_dashboard_error(self, view, mock_hass):
         """Test POST with tools/call for update_dashboard when it fails."""
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -416,7 +423,7 @@ class TestToolsDashboards:
     async def test_post_tools_call_delete_dashboard(self, view, mock_hass):
         """Test POST with tools/call for delete_dashboard."""
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",
@@ -445,7 +452,7 @@ class TestToolsDashboards:
     async def test_post_tools_call_delete_dashboard_error(self, view, mock_hass):
         """Test POST with tools/call for delete_dashboard when it fails."""
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {"Authorization": "Bearer valid_token", "Mcp-Session-Id": _TEST_SID}
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",

@@ -1,11 +1,13 @@
 """Tests for template entity CRUD tools."""
 
+import asyncio
 import json
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 from homeassistant.data_entry_flow import FlowResultType
 
+from custom_components.mcp_server_http_transport.const import DOMAIN
 from custom_components.mcp_server_http_transport.http import MCPEndpointView
 from custom_components.mcp_server_http_transport.tools.template import (
     create_template_entity,
@@ -14,6 +16,8 @@ from custom_components.mcp_server_http_transport.tools.template import (
     list_template_entities,
     update_template_entity,
 )
+
+_TEST_SID = "test-session-id"
 
 
 def _make_entry(entry_id: str, name: str, template_type: str, **fields) -> Mock:
@@ -292,7 +296,9 @@ class TestTemplateToolsViaHTTP:
     @pytest.fixture
     def mock_hass(self):
         hass = Mock()
-        hass.data = {"mcp_server_http_transport": Mock()}
+        hass.data = {
+            DOMAIN: {"mcp_sessions": {_TEST_SID: {"queue": asyncio.Queue(), "uris": set()}}}
+        }
         hass.states = Mock()
         hass.services = Mock()
         return hass
@@ -303,7 +309,10 @@ class TestTemplateToolsViaHTTP:
 
     def _make_request(self, method: str, params: dict, request_id: int = 1) -> Mock:
         request = Mock()
-        request.headers = {"Authorization": "Bearer valid_token"}
+        request.headers = {
+            "Authorization": "Bearer valid_token",
+            "Mcp-Session-Id": _TEST_SID,
+        }
         request.json = AsyncMock(
             return_value={
                 "jsonrpc": "2.0",

@@ -18,6 +18,7 @@ from .http import (
     MCPEndpointView,
     MCPProtectedResourceMetadataView,
     MCPSubpathProtectedResourceMetadataView,
+    _close_session,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -68,5 +69,7 @@ async def _async_update_listener(hass: HomeAssistant, entry: ConfigEntry) -> Non
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
+    for session in hass.data[DOMAIN].get("mcp_sessions", {}).values():
+        _close_session(session)
     hass.data[DOMAIN].clear()
     return True
