@@ -1,6 +1,7 @@
 """Automation, scene, and script CRUD and read tools."""
 
 import json
+import logging
 from typing import Any
 
 from homeassistant.core import HomeAssistant

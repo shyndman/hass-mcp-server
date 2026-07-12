@@ -1,6 +1,6 @@
 """MCP prompt definitions and handlers for Home Assistant."""
 
-import asyncio
+import inspect
 from typing import Any
 
 from homeassistant.core import HomeAssistant
@@ -46,7 +46,7 @@ async def get_prompt(hass: HomeAssistant, name: str, arguments: dict[str, Any]) 
     if prompt is None:
         raise ValueError(f"Unknown prompt: {name}")
     handler = prompt["handler"]
-    if asyncio.iscoroutinefunction(handler):
+    if inspect.iscoroutinefunction(handler):
         return await handler(hass, arguments)
     return handler(hass, arguments)
 

@@ -57,7 +57,7 @@ def _get_collection(hass: HomeAssistant, domain: str):
     ws_obj = getattr(list_handler, "__self__", None)
     if ws_obj is None or not hasattr(ws_obj, "storage_collection"):
         raise ValueError(
-            f"Cannot access storage collection for '{domain}' " "(unexpected handler structure)"
+            f"Cannot access storage collection for '{domain}' (unexpected handler structure)"
         )
 
     return ws_obj.storage_collection
@@ -254,8 +254,7 @@ async def create_helper(hass: HomeAssistant, arguments: dict[str, Any]) -> dict[
             "content": [
                 {
                     "type": "text",
-                    "text": f"Successfully created {domain} helper with id: "
-                    f"{item['id']}{suffix}",
+                    "text": f"Successfully created {domain} helper with id: {item['id']}{suffix}",
                 }
             ]
         }
