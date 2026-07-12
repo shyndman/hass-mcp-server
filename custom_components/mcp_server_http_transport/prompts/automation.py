@@ -14,7 +14,7 @@ _LOGGER = logging.getLogger(__name__)
 @register_prompt(
     name="automation_review",
     description=(
-        "Review an automation's configuration for issues, " "improvements, and best practices"
+        "Review an automation's configuration for issues, improvements, and best practices"
     ),
     arguments=[
         {
